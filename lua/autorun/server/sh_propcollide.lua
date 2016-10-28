@@ -3,20 +3,20 @@ PropMingeConfig = {} -- DO NOT EDIT
 ------- BEGIN CONFIG -------
 
 PropMingeConfig.IgnoreGroups = { -- Groups listed here will be exempt from the anti propminge
-	"group1",
-	"group2"
+	[ "group1" ] = true,
+	[ "group2" ] = true
 }
 
 PropMingeConfig.IgnoreSteamIDs = { -- Same as IgnoreGroups, but for SteamIDs
-	"STEAM_0:0:11",
-	"STEAM_0:0:00"
+	[ "STEAM_0:0:11" ] = true,
+	[ "STEAM_0:0:00" ] = true
 }
 
 PropMingeConfig.NoCollideEntities = { -- The entities you want the effect to be applied to
-	"prop_physics",
-	"gmod_cameraprop",
-	"Keypad",
-	"gmod_button"
+	["prop_physics"] = true,
+	["gmod_cameraprop"] = true,
+	["Keypad"] = true,
+	["gmod_button"] = true
 }
 
 PropMingeConfig.EnableAutoNocollide = true			-- Enable the automatic nocollide when physgunning a prop?
@@ -49,9 +49,9 @@ end
 function AutoNoCollide( ply, ent )
 	if (PropMingeConfig.EnableAutoNocollide) then
 		if (ent:CPPICanPhysgun(ply)) then
-			if (PropMingeConfig.IgnoreSteamIDs) and (!table.HasValue(PropMingeConfig.IgnoreSteamIDs, ply:SteamID())) and (PropMingeConfig.IgnoreGroups) and (!table.HasValue(PropMingeConfig.IgnoreGroups, ply:GetUserGroup())) then
-				if (table.HasValue(PropMingeConfig.NoCollideEntities, ent:GetClass())) then
-					if (timer.Exists("Unghost")) then 
+			if (PropMingeConfig.IgnoreSteamIDs) and (!PropMingeConfig.IgnoreSteamIDs[ ply:SteamID() ]) and (PropMingeConfig.IgnoreGroups) and ( PropMingeConfig.IgnoreGroups[ ply:GetUserGroup() ] ) then
+				if PropMingeConfig.NoCollideEntities[ ent:GetClass() ] then
+					if (timer.Exists("Unghost")) then
 						timer.Remove("Unghost")
 					end
 					ent:SetCollisionGroup(COLLISION_GROUP_WORLD)
@@ -80,7 +80,7 @@ hook.Add( "PhysgunPickup", "Auto Nocollide", AutoNoCollide )
 function AutoUnNoCollide( ply, ent )
 	local phys = ent:GetPhysicsObject()
 	if (PropMingeConfig.EnableAutoNocollide) then
-		if (table.HasValue(PropMingeConfig.NoCollideEntities, ent:GetClass())) then
+		if PropMingeConfig.NoCollideEntities[ ent:GetClass() ] then
 			if (ent:CPPICanPhysgun(ply)) then
 				if not (IsPlayerInside(ent)) then
 					timer.Create("Unghost", 0.5, 0, function()
